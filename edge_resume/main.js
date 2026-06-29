@@ -2,8 +2,9 @@ import { pipeline, env } from '@xenova/transformers';
 import * as webllm from '@mlc-ai/web-llm';
 import { resumeData, searchChunks } from './resume_data.js';
 
-// Configure transformers.js to load models from HuggingFace CDN instead of local server
+// Configure transformers.js to load models from HuggingFace mirror for speed & reliability
 env.allowLocalModels = false;
+env.remoteHost = 'https://hf-mirror.com';
 
 // Global state
 let embeddingPipeline = null;
@@ -334,8 +335,20 @@ async function loadLocalLLM() {
   };
   
   try {
+    // Map default prebuilt models to use the robust Hugging Face mirror
+    const customAppConfig = {
+      model_list: webllm.prebuiltAppConfig.model_list.map(model => {
+        const updated = { ...model };
+        if (updated.model_url && updated.model_url.includes('huggingface.co')) {
+          updated.model_url = updated.model_url.replace('huggingface.co', 'hf-mirror.com');
+        }
+        return updated;
+      })
+    };
+
     llmEngine = await webllm.CreateMLCEngine(currentModelId, {
-      initProgressCallback: initProgressCallback
+      initProgressCallback: initProgressCallback,
+      appConfig: customAppConfig
     });
     
     // Model loaded successfully
