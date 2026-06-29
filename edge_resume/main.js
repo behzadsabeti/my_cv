@@ -10,7 +10,7 @@ let embeddingPipeline = null;
 let resumeEmbeddings = null; // Map of chunkId -> embedding vector
 let llmEngine = null;
 let chatHistory = [];
-let currentModelId = 'Qwen/Qwen2-0.5B-Instruct-v0.1-MLC-q4f16_1';
+let currentModelId = 'SmolLM2-360M-Instruct-q4f16_1-MLC';
 
 // Initialize the app on load
 window.addEventListener('DOMContentLoaded', async () => {
@@ -367,8 +367,7 @@ async function loadLocalLLM() {
     document.getElementById('chat-input').placeholder = 'Ask me anything about Behzad (e.g. tell me about his thesis)...';
     document.getElementById('chat-send-btn').disabled = false;
     
-    // Update Diagnostic UI
-    document.getElementById('diag-vram').textContent = currentModelId.includes('0.5B') ? '~450 MB' : currentModelId.includes('1.5B') ? '~1.2 GB' : '~2.1 GB';
+    document.getElementById('diag-vram').textContent = currentModelId.includes('360M') ? '~220 MB' : currentModelId.includes('0.5B') ? '~450 MB' : (currentModelId.includes('1.5B') || currentModelId.includes('1B')) ? '~950 MB' : '~2.1 GB';
     
     appendSystemMessage('Model loaded! You are now speaking with Behzad Sabeti\'s local AI agent.');
     
